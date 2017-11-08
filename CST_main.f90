@@ -18,6 +18,10 @@ program CST_main
     real, allocatable :: kk_inv(:,:)        ! Inverse of the global stiffness matrix
     real, allocatable :: delta(:,:)         ! Stores calculated displacements
     real, allocatable :: ndnums(:)
+    real, allocatable :: eld(:,:)           ! Stores the element displacement vector 
+
+    real, allocatable :: EPS(:,:)           ! Store the elemental strains
+    real, allocatable :: SIGMA(:,:)         ! Store the elemental stresses
     
     integer, allocatable :: g(:,:)
     integer, allocatable :: connec(:,:)        ! Stores element Connectivity
@@ -120,6 +124,10 @@ program CST_main
     allocate(g(eldof,1))
     allocate(ke(eldof,eldof))
     allocate(delta(active_nf,1))
+    allocate(eld(eldof,1))
+
+    allocate(EPS(nel,nne))
+    allocate(SIGMA(nel,nne))
 
     call formdsig(E,nu,dee)
 
@@ -159,6 +167,27 @@ program CST_main
     ! Compute the required dedlections
     delta = matmul(kk_inv,fg)
 
+    ! Compute the stresses and strains in the elements
+    do elem_num=1,nel
+
+        call elem_CST(geom,connec,elem_num,Area,bee,nnd,nodof,nel,nne,eldof,nf,g)
+
+        ! Retrieve the displacements for the element at each node
+
+        do j=1,eldof
+            if (g(j,1)==0) then
+                eld(j,1) = 0
+            else
+                eld(j,1) = delta(g(j,1),1)
+            endif
+        end do
+
+        ! Compute the strains for the element
+        EPS(elem_num:elem_num,1:3)   = transpose(matmul(bee,eld))
+        SIGMA(elem_num:elem_num,1:3) = transpose(matmul(dee,matmul(bee,eld)))
+
+
+    end do 
 
     ! Compute the final co-ordinates(co-ordinate + delta)
     do i =1,nnd
@@ -179,10 +208,28 @@ program CST_main
 
     open(unit = 2789, file = "Results.sdb")
 
+    write(2789,*) 'Nodal displacements'
+    write(2789,*) ''
+
     do i =1,nnd
         write(2789,*) node_disp(i,1), node_disp(i,2)
-    end do                           
+    end do        
+
+    write(2789,*) '' 
+    write(2789,*) 'Strains'                  
+
+    do i =1,nel
+        write(2789,*) EPS(i,1),EPS(i,2),EPS(i,3)
+    end do 
     
+    write(2789,*) '' 
+    write(2789,*) 'Streses'                  
+
+    do i =1,nel
+        write(2789,*) SIGMA(i,1), SIGMA(i,2), SIGMA(i,3)
+    end do 
+
+
     close (2789)        
 
 
