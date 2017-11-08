@@ -233,17 +233,18 @@ end subroutine inverse
 
     ! Calculate the Area of CST element
     ! ---------------------------------
-    subroutine elem_CST(geom,connec,elem_num,Area,bee,nnd,nodof,nel,nne,eldof)
+    subroutine elem_CST(geom,connec,elem_num,Area,bee,nnd,nodof,nel,nne,eldof,nf,g)
 
         implicit none
 
         integer, intent(in) :: elem_num, connec(nel,nne),nnd,nodof,nel,nne,eldof
-        real, intent(in) :: geom(nnd,nodof)
-
+        real, intent(in) :: geom(nnd,nodof), nf(nnd,nodof)
 
         real, intent(out) :: Area, bee(nne,eldof)
+        integer, intent(out) :: g(eldof,1)
 
         real :: det, x1,y1,x2,y2,x3,y3, elem_coords(3,3), m(3,3)
+        integer :: j,k,l
 
         ! Extract the x,y-coordinates 
         ! --------------------------
@@ -289,6 +290,16 @@ end subroutine inverse
                          0.0, m(2,3), m(2,2), &
                          m(3,2), 0.0, m(3,3), &
                          0.0, m(3,3), m(3,2) /), (/ 3,6 /))
+
+        ! Form the steering vector
+        l = 0
+
+        do k=1,nne
+            do j=1,nodof
+                l = l+1
+                g(l,1) = nf(connec(elem_num,k),j)
+            enddo
+        enddo
 
 
     end subroutine elem_CST

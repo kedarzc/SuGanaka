@@ -143,21 +143,10 @@ program CST_main
 
     do elem_num=1,nel
 
-        call elem_CST(geom,connec,elem_num,Area,bee,nnd,nodof,nel,nne,eldof)
+        call elem_CST(geom,connec,elem_num,Area,bee,nnd,nodof,nel,nne,eldof,nf,g)
 
         ! Form the element stiffness matrix
         ke = thick*Area*matmul(matmul(transpose(bee),dee),bee)
-
-        ! Form the steering vector
-        l = 0
-
-        do k=1,nne
-            do j=1,nodof
-                l = l+1
-                 g(l,1) = nf(connec(elem_num,k),j)
-
-            enddo
-        enddo
 
         ! Form the global stiffness matrix
         call form_kk(kk,ke,g,active_nf,eldof)
