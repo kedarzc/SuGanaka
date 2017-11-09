@@ -10,7 +10,7 @@ Here is a list of the files and the data stored in each of them.
 2. MeshData_ABQ.csv : Stores the nodal information
 3. CST_main.f90 : Main Source code for SuGanaka
 4. MainModule.f90: A Module which stores various subroutines
-5. Results.sdb: sbb->SuGanaka Data Base, stores nodal displacements and element stresses and strains
+5. Results.sdb: sdb-SuGanaka Data Base, stores nodal displacements and element stresses and strains
 6. Results.vtk: A vtk file which can be used for visualization in Paraview
 7. CompileCodes.sh: A shell script to compile the codes and run it
 
