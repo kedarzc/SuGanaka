@@ -305,4 +305,34 @@ end subroutine inverse
     end subroutine elem_CST
 
 
+    ! This subroutine counts the number of lines in a file
+    subroutine countLines(fileName,nlines)
+
+        implicit none
+
+        character(len=*), intent(in) :: fileName
+        integer, intent(out) :: nlines
+
+        integer :: io, status
+
+        nlines = 0
+
+        open(10,file=fileName,status='old', action='read', iostat=status)
+
+        do 
+            read(10,*,iostat=io) 
+
+            if (io/=0) then
+                exit 
+            else
+                nlines = nlines + 1
+            end if
+        enddo
+
+
+        close(10)
+
+    end subroutine countLines
+
+
 end module MainModule

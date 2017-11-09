@@ -41,6 +41,8 @@ program CST_main
     real :: c
     real :: Area    ! Area of the element
     
+    character(len=50)    :: fileName_Nodes   ! File with nodal info
+     character(len=50)   :: fileName_Connec  ! Nodal Connectivity
 
     ! Variables for reading the input file
     integer :: status
@@ -57,8 +59,13 @@ program CST_main
 
     ! Please enter the inputs
     ! ----------------------
-    nnd   = 275  ! Number of nodes (total in the model)
-    nel   = 480  ! Total number of elements in the model
+
+    fileName_Nodes  = 'MeshData_ABQ.csv'
+    fileName_Connec = 'Connectivity_ABQ.csv'
+
+    ! Count the number of nodes and elements
+    call countLines(fileName_Nodes,nnd)
+    call countLines(fileName_Connec,nel)
 
     nodof = 2   ! Number of degrees of freedom per element
     nne   = 3   ! Number of nodes per Element
@@ -112,11 +119,11 @@ program CST_main
     allocate(connec(nel,nne))
 
     ! Read the Mesh Data
-    open(unit=15, file='MeshData_ABQ.csv', status='old', action='read', iostat=status)
+    open(unit=15, file=fileName_Nodes, status='old', action='read', iostat=status)
     read(15,*) ((geom(i,j),j=1,nodof),i=1,nnd)
 
     ! Read the Element Connectivity
-    open(unit=16, file='Connectivity_ABQ.csv', status='old', action='read', iostat=status)
+    open(unit=16, file=fileName_Connec, status='old', action='read', iostat=status)
     read(16,*) ((connec(i,j),j=1,nne),i=1,nel)
 
     allocate(dee(nodof+1,nodof+1))
